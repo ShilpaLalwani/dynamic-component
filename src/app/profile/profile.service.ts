@@ -34,7 +34,7 @@ export class ProfileService {
   loadComponent(vcr: ViewContainerRef, isLoggedIn: boolean) {
     vcr.clear();
 
-    return this.appService.forChild(vcr, {
+    return this.appService.loadComponent(vcr, {
       loadChildren: isLoggedIn ? this.clientProfile() : this.guestProfile()
     });
   }
