@@ -16,7 +16,7 @@ export interface ComponentLoader {
 export class AppService {
   constructor(private cfr: ComponentFactoryResolver) {}
 
-  forChild(vcr: ViewContainerRef, cl: ComponentLoader) {
+  loadComponent(vcr: ViewContainerRef, cl: ComponentLoader) {
     return from(cl.loadChildren()).pipe(
       map((component: any) => this.cfr.resolveComponentFactory(component)),
       map(componentFactory => vcr.createComponent(componentFactory))
