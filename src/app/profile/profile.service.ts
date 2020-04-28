@@ -1,27 +1,12 @@
-import { Injectable, ViewContainerRef } from '@angular/core';
+import { Injectable,ComponentFactoryResolver, ViewContainerRef } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { AppService } from '../app.service';
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
   private isLoggedIn = new BehaviorSubject(false);
   isLoggedIn$ = this.isLoggedIn.asObservable();
 
-  constructor(private appService: AppService) {}
-
-  private guestProfile() {
-    return () =>
-      import('./guest-card/guest-card.component').then(
-        m => m.GuestCardComponent
-      );
-  }
-
-  private clientProfile() {
-    return () =>
-      import('./user-card/user-card.component').then(
-        m => m.UserCardComponent
-      );
-  }
+  constructor(private cfr: ComponentFactoryResolver) {}
 
   login() {
     this.isLoggedIn.next(true);
@@ -31,11 +16,14 @@ export class ProfileService {
     this.isLoggedIn.next(false);
   }
 
-  loadComponent(vcr: ViewContainerRef, isLoggedIn: boolean) {
-    vcr.clear();
+  async loadComponent(vcr: ViewContainerRef, isLoggedIn: boolean) {
+    const { GuestCardComponent } = await import('./guest-card/guest-card.component');
 
-    return this.appService.resolveComponent(vcr, {
-      loadChildren: isLoggedIn ? this.clientProfile() : this.guestProfile()
-    });
-  }
-}
+    const { UserCardComponent } = await import('./user-card/user-card.component');
+
+    vcr.clear();
+    let component : any = isLoggedIn ? UserCardComponent : GuestCardComponent;
+   
+    return vcr.createComponent(
+      this.cfr.resolveComponentFactory(component))    
+}}
